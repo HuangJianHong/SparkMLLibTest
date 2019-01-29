@@ -79,19 +79,29 @@ object ALSDemo {
     }
   }
 
+
   /**
     * 计算RMSE ： 均方根误差；
     * 判断model是否是 最优推荐模型
     */
   def computeRMSE(model: MatrixFactorizationModel, data: RDD[Rating], n: Long): Double = {
+    //真实值：
     val predictions: RDD[Rating] = model.predict(data.map(x => (x.user, x.product)))
-    val predictionsAndRating: RDD[(Double, Double)] = predictions.map {
+
+    //数据：真实值((userID,itemID),rating) join 观测值 ((userID,itemID),rating)
+    /*
+     * select 真实值的评分,观测值的评分
+     * from 真实值,观测值
+     * where 真实值.(userID,itemID) = 观测值.(userID,itemID)
+     */
+    val predictionsAndRating = predictions.map {
       x => ((x.user, x.product), x.rating)
     }.join(data.map(x => ((x.user, x.product), x.rating))).values
 
+    //    println("******************************")
+    //    predictionsAndRating.foreach(println)
+    //    println("******************************")
     math.sqrt(predictionsAndRating.map(x => (x._1 - x._2) * (x._1 - x._2)).reduce(_ + _) / n)
-
   }
-
 
 }
