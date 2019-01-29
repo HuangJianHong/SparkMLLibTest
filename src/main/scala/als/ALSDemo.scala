@@ -54,6 +54,12 @@ object ALSDemo {
     sc.stop()
   }
 
+  /**
+    * 加载评分数据
+    *
+    * @param path 评分数据本地路径
+    * @return
+    */
   def loadRatingData(path: String): Seq[Rating] = {
     val lines: Iterator[String] = Source.fromFile(path).getLines()
 
@@ -73,10 +79,13 @@ object ALSDemo {
     }
   }
 
-  //计算RMSE ： 均方根误差
+  /**
+    * 计算RMSE ： 均方根误差；
+    * 判断model是否是 最优推荐模型
+    */
   def computeRMSE(model: MatrixFactorizationModel, data: RDD[Rating], n: Long): Double = {
-    val predictions: RDD[Rating] = model.predict((data.map(x => (x.user, x.product))))
-    val predictionsAndRating = predictions.map {
+    val predictions: RDD[Rating] = model.predict(data.map(x => (x.user, x.product)))
+    val predictionsAndRating: RDD[(Double, Double)] = predictions.map {
       x => ((x.user, x.product), x.rating)
     }.join(data.map(x => ((x.user, x.product), x.rating))).values
 
