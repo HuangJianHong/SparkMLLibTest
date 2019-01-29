@@ -1,8 +1,9 @@
+package cf
+
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.mllib.linalg.distributed.{CoordinateMatrix, MatrixEntry, RowMatrix}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
-
 
 /**
   * 1、建立用户的相似度矩阵: 注意是用户和用户之间的

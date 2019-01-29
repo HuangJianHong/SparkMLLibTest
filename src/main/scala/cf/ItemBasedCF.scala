@@ -1,3 +1,5 @@
+package cf
+
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.mllib.linalg
 import org.apache.spark.mllib.linalg.SparseVector
