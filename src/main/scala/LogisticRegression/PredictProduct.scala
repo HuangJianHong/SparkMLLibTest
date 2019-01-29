@@ -26,6 +26,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object PredictProduct {
 
   def main(args: Array[String]): Unit = {
+
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR)
     Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
 
@@ -33,6 +34,7 @@ object PredictProduct {
     val sc = new SparkContext(conf)
 
     val data: RDD[String] = sc.textFile("D:\\temp\\data\\sales.data")
+    //读入数据 ----> 封装LabeledPoint
     val parseData: RDD[LabeledPoint] = data.filter(_.length > 0).map(line => {
       //分词操作：按照@分词
       val parts: Array[String] = line.split("@")
@@ -43,6 +45,17 @@ object PredictProduct {
 
     //执行逻辑回归:   2 表示二分类，
     val model: LogisticRegressionModel = new LogisticRegressionWithLBFGS().setNumClasses(2).run(parseData)
+
+    /**
+      * 生产上，将模型保存到HDFS，并不需要经常变换
+      * HDP的端口 8020；
+      * 需要设置，环境变量，否则权限不过，运行有问题
+      */
+//    System.setProperty("HADOOP_USER_NAME", "hdfs")
+//    model.save(sc, "hdfs://192.168.18.21:8020/PredictMode")
+//
+//    模型已经存的话， 加载改模型
+//    model: LogisticRegressionModel = LogisticRegressionModel.load(sc, "hdfs://192.168.18.21:8020/PredictMode")
 
 
     //使用该模型进行预测用户
